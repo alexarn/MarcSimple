@@ -12,6 +12,8 @@ use vars qw(@ISA @EXPORT);
 @EXPORT = qw(
     &IsMarcRecord
     &DefNoNull
+    &IsValidTag
+    &IsValidCode
 );
 
 =head1 NAME
@@ -57,6 +59,37 @@ sub DefNoNull {
     else {
         return 0;
     }
+}
+
+=head2 IsValidTag
+
+    IsvalidTag('099');
+
+Tell if a given tag is a valid MARC tag.
+
+=cut
+
+sub IsValidTag {
+    my $tag = shift;
+
+    return 0 if $tag eq '000';
+    return 1 if defined $tag && $tag =~ /^[0-9]{3}$/;
+    return 0;
+}
+
+=head2 IsValidCode
+
+    IsvalidCode('a');
+
+Tell if a given subfield code is a valid MARC code.
+
+=cut
+
+sub IsValidCode {
+    my $code = shift;
+
+    return 1 if defined $code && $code =~ /^[0-9A-Za-z]{1}$/;
+    return 0;
 }
 
 1;

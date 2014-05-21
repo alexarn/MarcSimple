@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use MARC::Record;
 
-use Test::More tests => 12;
+use Test::More tests => 15;
 
 BEGIN {
   use_ok('MarcSimple::Crud');
@@ -54,3 +54,12 @@ is($success, 0, 'Try to update subfield with null value using UpdateSubfield');
 
 $success = UpdateSubfield('foo', '010$a', '978-2603016534');
 is($success, 0, 'Try to update subfield on non marc record using UpdateSubfield');
+
+$success = SubfieldsToMarc($record, '600', [ [ 'a', 'Foo' ], [ 'b', 'Bar'] ]);
+is($success, 1, 'Add valid subfields in tag 600');
+
+$success = SubfieldsToMarc($record, '600', 'I\'m not an array :)');
+is($success, 0, 'Pass a non array ref as third parameter should return 0');
+
+$success = SubfieldsToMarc($record, '601', [ [ 'a' ], [ 'b'] ]);
+is($success, 0, 'Pass invalid subfields without values');

@@ -13,6 +13,7 @@ use vars qw(@ISA @EXPORT);
     &GetSubfield
     &AddSubfield
     &UpdateSubfield
+    &SubfieldsToMarc
 );
 
 =head1 NAME
@@ -112,6 +113,38 @@ sub UpdateSubfield {
         }
     }
     return 0;
+}
+
+=head2 SubfieldsToMarc
+
+    my $sucess = SubfieldsToMarc($record, $tag, [ [ 'a', 'foo' ], [ 'b', 'bar'] ]);
+
+Put a subfields array in a record ($record) with a given tag ($tag).
+
+=cut
+
+sub SubfieldsToMarc {
+    my ($record, $tag, $subfields) = @_;
+
+    return 0 unless IsMarcRecord($record);
+    return 0 unless IsValidTag($tag);
+
+    eval { my $a = @$subfields; };
+    # Not an array reference.
+    return 0 if $@;
+
+    my $success = 1;
+    foreach my $subfield ( @$subfields ) {
+        my $code = $subfield->[0] if $subfield->[0];
+        my $value = $subfield->[1] if $subfield->[1];
+        next unless IsValidCode($code);
+
+        my $zone = "$tag\$$code";
+        my $result = AddSubfield($record, $zone, $value);
+        $success = 0 unless $result;
+    }
+
+    return $success;
 }
 
 1;
